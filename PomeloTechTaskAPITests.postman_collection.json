@@ -1,0 +1,1056 @@
+{
+	"info": {
+		"_postman_id": "c150928e-333d-4d9f-8600-0f062ad524a9",
+		"name": "Pomelo Auth endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST /user - Green Path, Create Admin user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aedc29e8-7102-4585-8912-b72cb42d598b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"message is set correctly\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successfully created your user\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"David\",\n\t\"email\":\"davidhackett36@gmail.com\",\n\t\"password\":\"password123\",\n\t\"type\":\"ADMIN\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /signin - Green Path, Sign in admin user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "02e51539-b41d-4d1d-95f0-698fe7060cdf",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.globals.set(\"david_authToken\", jsonData.payload.accessToken);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successful authentication\");",
+							"});",
+							"",
+							"pm.test(\"Access token is included\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.accessToken).not.eql(undefined);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"david\",\n\t\"password\":\"password123\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/signin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Green Path, Admin gets different user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "206d1211-53a5-439f-b0ac-20969176d41f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successful user retrieval\");",
+							"});",
+							"",
+							"pm.test(\"User fields are returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.username).to.eql(\"alison\");",
+							"    pm.expect(jsonData.payload.email).to.eql(\"alison@aol.com\");",
+							"    pm.expect(jsonData.payload.type).to.eql(\"ADMIN\");",
+							"});",
+							"",
+							"pm.test(\"Password is not returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.password).to.eql(undefined);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{david_authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/Alison",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"Alison"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Green Path, Admin gets their own user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4713dd36-b9bf-4813-8184-b53cbff510bd",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successful user retrieval\");",
+							"});",
+							"",
+							"pm.test(\"User fields are returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.username).to.eql(\"david\");",
+							"    pm.expect(jsonData.payload.email).to.eql(\"davidhackett36@gmail.com\");",
+							"    pm.expect(jsonData.payload.type).to.eql(\"ADMIN\");",
+							"});",
+							"",
+							"pm.test(\"Password is not returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.password).to.eql(undefined);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{david_authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/David",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"David"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /user - Green Path, Create Customer user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2fdcd6d6-2bea-4a7f-bd52-b48cab427885",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"message is set correctly\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successfully created your user\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"Ellie\",\n\t\"email\":\"somerandom@apple.com\",\n\t\"password\":\"2d12hsx3\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /signin - Green Path, Sign in a customer user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3d9f7e95-c014-411d-9cff-2f3fab4ee960",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.globals.set(\"ellie_authToken\", jsonData.payload.accessToken);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successful authentication\");",
+							"});",
+							"",
+							"pm.test(\"Access token is included\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.accessToken).not.eql(undefined);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"Ellie\",\n\t\"password\":\"2d12hsx3\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/signin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Green Path, Customer gets their own user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cd684ff0-e18a-46cc-b392-3e1ad1f9d689",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"successful user retrieval\");",
+							"});",
+							"",
+							"pm.test(\"User fields are returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.username).to.eql(\"ellie\");",
+							"    pm.expect(jsonData.payload.email).to.eql(\"somerandom@apple.com\");",
+							"    pm.expect(jsonData.payload.type).to.eql(\"CUSTOMER\");",
+							"});",
+							"",
+							"pm.test(\"Password is not returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payload.password).to.eql(undefined);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ellie_authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/Ellie",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"Ellie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /signin - Red Path, Missing values from request body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b286b137-4441-49f1-85f2-02cd16681b5f",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"missing required fields\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"MISSING_VALUES\");",
+							"});",
+							"",
+							"pm.test(\"Errors include two missing fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors.length).to.eql(2);",
+							"    pm.expect(jsonData.errors[0].field).to.eql(\"username\");",
+							"    pm.expect(jsonData.errors[0].status).to.eql(\"MISSING\");",
+							"    pm.expect(jsonData.errors[1].field).to.eql(\"password\");",
+							"    pm.expect(jsonData.errors[1].status).to.eql(\"MISSING\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "localhost:8080/signin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /signin - Red Path, Incorrect username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "adaf2b13-4c3a-4bb4-84a5-33cd2013ea92",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"invalid username/password\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"INVALID_LOGIN\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"elli\",\n\t\"password\":\"2d12hsx3\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/signin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /signin - Red Path, Incorrect password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c95e3f1e-2823-43fd-a490-b45e527294bb",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"invalid username/password\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"INVALID_LOGIN\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"ellie\",\n\t\"password\":\"wrongpass123\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/signin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /user - Red Path, Missing values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c83ff45d-0663-4b7c-b6c6-0d325b27cd99",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"missing required fields\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"MISSING_VALUES\");",
+							"});",
+							"",
+							"pm.test(\"Errors include three missing fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors.length).to.eql(3);",
+							"    pm.expect(jsonData.errors[0].field).to.eql(\"username\");",
+							"    pm.expect(jsonData.errors[0].status).to.eql(\"MISSING\");",
+							"    pm.expect(jsonData.errors[1].field).to.eql(\"email\");",
+							"    pm.expect(jsonData.errors[1].status).to.eql(\"MISSING\");",
+							"    pm.expect(jsonData.errors[2].field).to.eql(\"password\");",
+							"    pm.expect(jsonData.errors[2].status).to.eql(\"MISSING\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /user - Red Path, Duplicate username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "83733ef6-8618-421b-9d57-b9b964aab5d4",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"value already exists\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"DUPLICATE_VALUES\");",
+							"});",
+							"",
+							"pm.test(\"Errors include one duplicate field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors.length).to.eql(1);",
+							"    pm.expect(jsonData.errors[0].field).to.eql(\"username\");",
+							"    pm.expect(jsonData.errors[0].status).to.eql(\"DUPLICATE\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"David\",\n\t\"email\":\"davidhackett@gmail.com\",\n\t\"password\":\"password123\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /user - Red Path, Duplicate email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c0071af7-8c25-4459-8cf1-fffaeabdf0d0",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"value already exists\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"DUPLICATE_VALUES\");",
+							"});",
+							"",
+							"pm.test(\"Errors include one duplicate field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors.length).to.eql(1);",
+							"    pm.expect(jsonData.errors[0].field).to.eql(\"email\");",
+							"    pm.expect(jsonData.errors[0].status).to.eql(\"DUPLICATE\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"Davey\",\n\t\"email\":\"davidhackett36@gmail.com\",\n\t\"password\":\"password123\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /user - Red Path, Invalid values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7e6259fb-208f-4a08-9482-215e80b31410",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"contains invalid fields\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"INVALID_VALUES\");",
+							"});",
+							"",
+							"pm.test(\"Errors include three invalid fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors.length).to.eql(3);",
+							"    pm.expect(jsonData.errors[0].field).to.eql(\"email\");",
+							"    pm.expect(jsonData.errors[0].status).to.eql(\"INVALID\");",
+							"    pm.expect(jsonData.errors[1].field).to.eql(\"password\");",
+							"    pm.expect(jsonData.errors[1].status).to.eql(\"INVALID\");",
+							"    pm.expect(jsonData.errors[2].field).to.eql(\"type\");",
+							"    pm.expect(jsonData.errors[2].status).to.eql(\"INVALID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"user12345\",\n\t\"email\":\"invalidemail\",\n\t\"password\":\"ip\",\n\t\"type\":\"invalidtype\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Red Path, Unauthorised due to missing header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "796372f0-e1c8-4cb2-8dc4-987da118e13c",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/Ellie",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"Ellie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Red Path, Unauthorised due to signature mismatch",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db5a6c6f-c4c1-4a25-a162-6eb8e317bf9f",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer astuhgcas.edaxcvdes.vsrgsdfggdvsacd",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/Ellie",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"Ellie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Red Path, Unauthorised due to expired jwt",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "695de087-7e33-44dc-b880-9dd32e74f4ec",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"UNAUTHORIZED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkYXZpZCIsInV0eXBlIjoiQURNSU4iLCJpYXQiOjE1NjEyOTQ3MDQsImV4cCI6MTU2MTI5ODMwNH0.vOJYxp4J6OigwktIyz3h2DxB8lEA1v8bw8MOc5GEd+s=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/David",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"David"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Red Path, Forbidden",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ellie_authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/Alison",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"Alison"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /user/{username} - Red Path, User not found ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f9080259-cdb2-44d8-a01c-56953b151df8",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Message is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"user not found\");",
+							"});",
+							"",
+							"pm.test(\"Code is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(\"NOT_FOUND\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{david_authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/user/fakeUser",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"fakeUser"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

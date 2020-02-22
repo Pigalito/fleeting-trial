@@ -1,0 +1,22 @@
+{
+  "name": "fleeting-trial",
+  "version": "0.0.1",
+  "description": "Simple API offering OAuth 2.0 security and user registration",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/initialiseAPI.js",
+    "test": "nodeunit test/*"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.19.1",
+    "nodeunit": "^0.11.3",
+    "sinon": "^7.3.2"
+  },
+  "dependencies": {
+    "alasql": "^0.4.11",
+    "base64url": "^3.0.1",
+    "express": "^4.17.1"
+  }
+}
